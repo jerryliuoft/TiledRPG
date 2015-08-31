@@ -30,7 +30,7 @@ window.onload = function() {
 
 		// Create Map
 		MapGroup = game.add.group();
-		game.stage.backgroundColor = "#ffffff"
+		game.stage.backgroundColor = "#000000"
 	    for(var i = 0; i < MapSizeY; i ++){
 	     	MapArray[i] = [];
 			for(var j = 0; j < MapSizeX; j ++){
@@ -39,6 +39,11 @@ window.onload = function() {
 				MapTile.inputEnabled = true;
 				MapTile.hitArea= new Phaser.Rectangle(TileOffsetX, TileOffsetY, TileWidth, TileHeight);
 				MapTile.events.onInputDown.add (Map_event,this);
+				MapTile.data= {
+					moveable: false,
+					row: i,
+					col: j
+				}
 				MapGroup.add(MapTile);
 				MapArray[i][j] = MapTile;
 			}
@@ -52,6 +57,7 @@ window.onload = function() {
 			row: 1,
 			col: 1
 		}
+		update_moveable(player.data.row, player.data.col, true);
 		//player.anchor.set(0.5,0.5);
 		//player.offsetX = MapOffsetX;
 		//player.offsetY = MapOffsetY;
@@ -72,27 +78,46 @@ window.onload = function() {
 
 	function render(){
 		game.debug.text ("Player Row"+ player.data.row+ " Player Col:" + player.data.col, 30 , 30);
-		game.debug.bodyInfo(MapArray[2][2]);
+		game.debug.spriteInfo(player,30,30);
+
 	}
 
 	function Map_event(MapTile){
-		if (player.x != MapTile.x || player.y != MapTile.y){
-			if (player.x < MapTile.x){
-				player.x +=1;
-			}else{
-				player.x -=1;
-			}
-			if (player.y < MapTile.y){
-				player.y +=1;
-			}else{
-				player.y -=1;
-			}
 
+		// check if map is adjacent
+		if (MapTile.data.moveable ){
+
+			//update moveable
+			update_moveable(player.data.row, player.data.col, false);
+			update_moveable(MapTile.data.row, MapTile.data.col, true);
+
+			// add movement using tween
+			move_tween = game.add.tween(player).to ({x: MapTile.x, y: MapTile.y},500 );
+			move_tween.interpolation(Phaser.Math.catmullRomInterpolation);
+			move_tween.start();
+
+			//update player position
+			player.data.row = MapTile.data.row;
+			player.data.col = MapTile.data.col;
 
 		}
+			MapTile.tint = Math.random() * 0xffffff;
+	}
+	// update the maptile's data of moveable by checking 4 sides.
+	function update_moveable (row, col, moving ){
 
-
-		MapTile.tint = Math.random() * 0xffffff;
+			if (row -1 >= 0){
+				MapArray[row-1][col].data.moveable=moving;
+			}
+			if(row+1 < MapSizeX){
+				MapArray[row+1][col].data.moveable = moving;
+			}
+			if (col -1 >=0 ){
+				MapArray[row][col-1].data.moveable= moving;
+			}
+			if (col+1 < MapSizeY){
+				MapArray[row][col+1].data.moveable= moving;
+			}
 	}
 
 }
