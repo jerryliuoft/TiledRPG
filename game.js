@@ -52,14 +52,15 @@ var Game ={
 				MapArray[i][j] = MapTile;
 			}
 		}
+		create_town(); // has to go before the offset to stay in order
 		MapGroup.x = MapOffsetX;
 		MapGroup.y = MapOffsetY;
 
 		//Create Player	
-		player = game.add.sprite (MapArray[1][1].x+ TileWidth/2,MapArray[1][1].y+TileHeight/2, "player");
+		player = game.add.sprite (MapArray[MapSizeY-1][0].x+ TileWidth/2,MapArray[MapSizeY-1][0].y+TileHeight/2, "player");
 		player.data= {
-			row: 1,
-			col: 1
+			row: MapSizeY-1,
+			col: 0
 		}
 		update_moveable(player.data.row, player.data.col, true);
 		//player.anchor.set(0.5,0.5);
@@ -67,7 +68,7 @@ var Game ={
 		//player.offsetY = MapOffsetY;
 		game.physics.enable(player, Phaser.Physics.ARCADE);
 
-		//create movement overlay
+
 
 
 	},
@@ -120,4 +121,21 @@ function update_moveable (row, col, moving ){
 		if (col+1 < MapSizeX){
 			MapArray[row][col+1].data.moveable= moving;
 		}
+}
+// create a town  in Map (end point)
+function create_town (){
+	var col = game.rnd.integerInRange(0,MapSizeX-1);
+	var row = game.rnd.integerInRange(0,1);
+
+	var MapTile = game.add.sprite(MapArray[row][col].x, MapArray[row][col].y, "selector");
+	MapTile.inputEnabled = true;
+	MapTile.hitArea= new Phaser.Rectangle(TileOffsetX, TileOffsetY, TileWidth, TileHeight);
+	MapTile.events.onInputDown.add (Map_event,this);
+	MapTile.data= {
+		moveable: false,
+	}
+	MapGroup.add(MapTile);
+	MapArray[row][col].destroy();
+	MapArray[row][col] = MapTile;
+
 }
