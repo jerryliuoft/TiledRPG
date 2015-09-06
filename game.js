@@ -157,6 +157,8 @@ function create_town (){
 }
 
 function create_enemy(row, col){
+
+	//NTOE: can change hit area to minimal so that it'll not be clicked
 	var EnemyTile = game.add.sprite(MapArray[row][col].x, MapArray[row][col].y,"enemy");
 	EnemyTile.data ={
 		HP: 10,
@@ -165,8 +167,10 @@ function create_enemy(row, col){
 		row: row,
 		col: col
 	}
-	EnemyTile.inputEnabled=true;
-	EnemyTile.events.onInputDown.add(battle_event,this);
+	//EnemyTile.inputEnabled=true;
+	//EnemyTile.events.onInputDown.add(battle_event,this);
+
+	EnemyTile.hitArea= new Phaser.Rectangle(0, 0, 0, 0);
 	MapArray[row][col].data.hasEnemy = true;
 	EnemyArray[0]=EnemyTile;
 	EnemyGroup.add(EnemyTile);
