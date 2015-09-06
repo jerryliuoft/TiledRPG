@@ -18,6 +18,7 @@
 // player variables;
     var player;
     var player_moveable = true;
+    var player_hp_display;
 
     var EnemyGroup;
     var EnemyArray = [];
@@ -80,9 +81,13 @@ var Game ={
 		//player.offsetX = MapOffsetX;
 		//player.offsetY = MapOffsetY;
 		game.physics.enable(player, Phaser.Physics.ARCADE);
+		//add player HP and other stats on TOP
+		add_stats_overlay();
 
 	},
 	update: function () {
+
+		player_hp_display.text = player.data.HP.toString();
 
 
 
@@ -95,6 +100,7 @@ var Game ={
 		//game.debug.text ("Player Row"+ player.data.row+ " Player Col:" + player.data.col, 30 , 30);
 		//game.debug.text ("Player Row"+ MapArray[][j].data.row+ " Player Col:" + MapArray[i][j].data.col, 30 , 30);
 		//game.debug.spriteInfo(player,30,30);
+
 
 	}
 
@@ -195,5 +201,17 @@ function town_event(Maptile){
 
 	if (Maptile.data.moveable)
 		game.state.start('Menu');
+
+}
+
+function add_stats_overlay (){
+
+    // Add Text to top of game.
+    var textStyle_Key = { font: "bold 14px sans-serif", fill: "#46c0f9", align: "center" };
+    var textStyle_Value = { font: "bold 18px sans-serif", fill: "#fff", align: "center" };
+    // HP.
+    game.add.text(30, 20, "HP: ", textStyle_Key);
+    player_hp_display = game.add.text (60, 20, player.data.HP.toString(), textStyle_Key);
+ 
 
 }
