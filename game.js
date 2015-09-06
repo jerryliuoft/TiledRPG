@@ -163,7 +163,7 @@ function create_enemy(row, col){
 	EnemyTile.data ={
 		HP: 10,
 		DEF: 1,
-		ATK: 4,
+		ATK: 2,
 		row: row,
 		col: col
 	}
@@ -180,8 +180,13 @@ function create_enemy(row, col){
 function battle_event(enemy){
 
 	if (MapArray[enemy.data.row][enemy.data.col].data.moveable){
-		enemy.destroy();
-		MapArray[enemy.data.row][enemy.data.col].data.hasEnemy = false;
+		player.data.HP -= enemy.data.ATK - player.data.DEF;
+		enemy.data.HP -= player.data.ATK - enemy.data.DEF;
+		if (enemy.data.HP <= 0){
+			enemy.destroy();
+			MapArray[enemy.data.row][enemy.data.col].data.hasEnemy = false;
+		}
+
 	}
 
 }
