@@ -11,9 +11,17 @@
 	var MapOffsetX = 30;
 	var MapOffsetY = 30;
 
+	var InventorySizeX=2;
+	var InventoryX= MapSizeX * TileWidth + MapOffsetX + 20;
+	var InventoryY = 10;
+
     var MapGroup;
     var MapArray = [];
 
+    var ChanceCardX = 600;
+    var ChanceCardY = 300;
+
+    var hasEvent = false;
 /////////////////////////////
 // player variables;
     var player;
@@ -23,6 +31,8 @@
     var EnemyGroup;
     var EnemyArray = [];
 
+    var ChanceCardGroup;
+    var ChanceCardArray = [];
 
 
 var Game ={
@@ -34,6 +44,8 @@ var Game ={
 		game.load.image("player", "PlanetCute/Character Boy.png");
 		game.load.image("town", "PlanetCute/Wall Block.png");
 		game.load.image("enemy","PlanetCute/Character Princess Girl.png")
+
+		game.load.image("sword", "ChanceCards/Sword.png")
 	},
 
 	create: function() {
@@ -41,7 +53,9 @@ var Game ={
 		// Create Map
 		MapGroup = game.add.group();
 		EnemyGroup = game.add.group();
-		game.stage.backgroundColor = "#FFFFFF"
+		ChanceCardGroup = game.add.group();
+
+		game.stage.backgroundColor = "#000000"
 	    for(var i = 0; i < MapSizeY; i ++){
 	     	MapArray[i] = [];
 			for(var j = 0; j < MapSizeX; j ++){
@@ -64,6 +78,8 @@ var Game ={
 
 		create_town(); // has to go before the offset to stay in order
 		create_enemy(2,2);
+		create_chance_cards();
+
 		MapGroup.x = MapOffsetX;
 		MapGroup.y = MapOffsetY;
 
@@ -72,7 +88,7 @@ var Game ={
 		player.data= {
 			HP: 10,
 			DEF: 1,
-			ATK:4,
+			ATK: 4,
 			row: MapSizeY-1,
 			col: 0
 		}
@@ -80,19 +96,21 @@ var Game ={
 		//player.anchor.set(0.5,0.5);
 		//player.offsetX = MapOffsetX;
 		//player.offsetY = MapOffsetY;
-		game.physics.enable(player, Phaser.Physics.ARCADE);
+		//game.physics.enable(player, Phaser.Physics.ARCADE);
+
 		//add player HP and other stats on TOP
-		add_stats_overlay();
+		create_stats_overlay();
+		create_inventory();
 
 	},
 	update: function () {
 
 		player_hp_display.text = player.data.HP.toString();
+		if (player.data.HP <1){
+			//game over
+			game.state.start('Menu');
 
-
-
-		
-
+		}
 
 	},
 
@@ -106,9 +124,26 @@ var Game ={
 
 }
 
+function create_chance_cards (){
+	//create the card outside of camera
+	var ChanceTile = game.add.sprite(0, 0, "sword");
+
+	ChanceTile.inputEnabled = false;
+	ChanceTile.events.onInputDown.add (chance_event,this);
+	ChanceTile.kill();
+	// fill the array
+	ChanceCardArray[0] =ChanceTile;
+	ChanceCardGroup.add(ChanceTile);
+}
+
 
 function Map_event(MapTile){
 	// check if map is adjacent
+	if (hasEvent){
+		return;
+	}
+
+
 	if (MapTile.data.moveable ){
 
 
@@ -126,6 +161,12 @@ function Map_event(MapTile){
 		//update player position
 		player.data.row = MapTile.data.row;
 		player.data.col = MapTile.data.col;
+
+		//start event;
+
+		hasEvent = true;
+		get_chance_card();
+
 	}
 		MapTile.tint = Math.random() * 0xffffff;
 }
@@ -143,6 +184,40 @@ function update_moveable (row, col, moving ){
 		if (col+1 < MapSizeX){
 			MapArray[row][col+1].data.moveable= moving;
 		}
+}
+//create chance card to boost player stats: start with add HP;
+function get_chance_card (){
+
+
+	MapGroup.alpha = 0.5;
+	MapGroup.inputEnabled = false;
+	var rng = game.rnd.integerInRange(0,1);
+	var show_card_tween = game.add.tween(ChanceCardArray[0]).to({x: ChanceCardX/2, y:ChanceCardY}, 500);
+	
+	switch (rng){
+		default :
+			ChanceCardArray[0].reset(ChanceCardX, ChanceCardY);
+			ChanceCardArray[0].inputEnabled= true;
+			show_card_tween.start();
+			
+			break;
+
+	}
+	
+}
+
+//events for what happens when the card is clicked
+function chance_event(ChanceTile){
+
+	MapGroup.InputEnabled = true; // restore control
+	MapGroup.alpha = 1;
+	ChanceTile.visiable = false;
+	ChanceTile.inputEnabled = false;
+
+	player.data.HP +=1;
+	hasEvent = false;
+	ChanceTile.kill();
+
 }
 // create a town  in Map (end point)
 function create_town (){
@@ -204,7 +279,7 @@ function town_event(Maptile){
 
 }
 
-function add_stats_overlay (){
+function create_stats_overlay (){
 
     // Add Text to top of game.
     var textStyle_Key = { font: "bold 14px sans-serif", fill: "#46c0f9", align: "center" };
@@ -214,4 +289,7 @@ function add_stats_overlay (){
     player_hp_display = game.add.text (60, 20, player.data.HP.toString(), textStyle_Key);
  
 
+}
+function create_inventory(){
+	// empty need to implement
 }
