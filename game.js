@@ -19,6 +19,10 @@
     var player;
     var player_moveable = true;
 
+    var EnemyGroup;
+    var EnemyArray = [];
+
+
 
 var Game ={
 		               
@@ -27,13 +31,15 @@ var Game ={
 	preload: function () {
 		game.load.image("grass_map", "PlanetCute/Grass Block.png");
 		game.load.image("player", "PlanetCute/Character Boy.png");
-		game.load.image("selector", "PlanetCute/Selector.png");
+		game.load.image("town", "PlanetCute/Wall Block.png");
+		game.load.image("enemy","PlanetCute/Character Princess Girl.png")
 	},
 
 	create: function() {
 
 		// Create Map
 		MapGroup = game.add.group();
+		EnemyGroup = game.add.group();
 		game.stage.backgroundColor = "#FFFFFF"
 	    for(var i = 0; i < MapSizeY; i ++){
 	     	MapArray[i] = [];
@@ -45,6 +51,7 @@ var Game ={
 				MapTile.events.onInputDown.add (Map_event,this);
 				MapTile.data= {
 					moveable: false,
+					hasEnemy: false,
 					row: i,
 					col: j
 				}
@@ -52,13 +59,19 @@ var Game ={
 				MapArray[i][j] = MapTile;
 			}
 		}
+
+
 		create_town(); // has to go before the offset to stay in order
+		create_enemy(2,2);
 		MapGroup.x = MapOffsetX;
 		MapGroup.y = MapOffsetY;
 
 		//Create Player	
 		player = game.add.sprite (MapArray[MapSizeY-1][0].x+ TileWidth/2,MapArray[MapSizeY-1][0].y+TileHeight/2, "player");
 		player.data= {
+			HP: 10,
+			DEF: 1,
+			ATK:4,
 			row: MapSizeY-1,
 			col: 0
 		}
@@ -67,9 +80,6 @@ var Game ={
 		//player.offsetX = MapOffsetX;
 		//player.offsetY = MapOffsetY;
 		game.physics.enable(player, Phaser.Physics.ARCADE);
-
-
-
 
 	},
 	update: function () {
@@ -94,6 +104,12 @@ var Game ={
 function Map_event(MapTile){
 	// check if map is adjacent
 	if (MapTile.data.moveable ){
+
+
+		if (MapTile.data.hasEnemy){
+			battle_event(EnemyArray[0]);
+			return;
+		}
 		//update moveable
 		update_moveable(player.data.row, player.data.col, false);
 		update_moveable(MapTile.data.row, MapTile.data.col, true);
@@ -127,7 +143,7 @@ function create_town (){
 	var col = game.rnd.integerInRange(0,MapSizeX-1);
 	var row = game.rnd.integerInRange(0,1);
 
-	var MapTile = game.add.sprite(MapArray[row][col].x, MapArray[row][col].y, "selector");
+	var MapTile = game.add.sprite(MapArray[row][col].x, MapArray[row][col].y, "town");
 	MapTile.inputEnabled = true;
 	MapTile.hitArea= new Phaser.Rectangle(TileOffsetX, TileOffsetY, TileWidth, TileHeight);
 	MapTile.events.onInputDown.add (town_event,this);
@@ -140,8 +156,35 @@ function create_town (){
 
 }
 
+function create_enemy(row, col){
+	var EnemyTile = game.add.sprite(MapArray[row][col].x, MapArray[row][col].y,"enemy");
+	EnemyTile.data ={
+		HP: 10,
+		DEF: 1,
+		ATK: 4,
+		row: row,
+		col: col
+	}
+	EnemyTile.inputEnabled=true;
+	EnemyTile.events.onInputDown.add(battle_event,this);
+	MapArray[row][col].data.hasEnemy = true;
+	EnemyArray[0]=EnemyTile;
+	EnemyGroup.add(EnemyTile);
+
+}
+
+function battle_event(enemy){
+
+	if (MapArray[enemy.data.row][enemy.data.col].data.moveable){
+		enemy.destroy();
+		MapArray[enemy.data.row][enemy.data.col].data.hasEnemy = false;
+	}
+
+}
+
 function town_event(Maptile){
 
-	game.state.start('Menu');
+	if (Maptile.data.moveable)
+		game.state.start('Menu');
 
 }
