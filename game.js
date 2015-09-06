@@ -130,12 +130,18 @@ function create_town (){
 	var MapTile = game.add.sprite(MapArray[row][col].x, MapArray[row][col].y, "selector");
 	MapTile.inputEnabled = true;
 	MapTile.hitArea= new Phaser.Rectangle(TileOffsetX, TileOffsetY, TileWidth, TileHeight);
-	MapTile.events.onInputDown.add (Map_event,this);
+	MapTile.events.onInputDown.add (town_event,this);
 	MapTile.data= {
 		moveable: false,
 	}
 	MapGroup.add(MapTile);
 	MapArray[row][col].destroy();
 	MapArray[row][col] = MapTile;
+
+}
+
+function town_event(Maptile){
+
+	game.state.start('Menu');
 
 }
