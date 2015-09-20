@@ -22,6 +22,9 @@
     var ChanceCardY = 300;
 
     var hasEvent = false;
+    var hasGirl = false;
+    
+
 /////////////////////////////
 // player variables;
     var player;
@@ -35,7 +38,7 @@
     var ChanceCardArray = [];
 
 
-var Game ={
+var GameState ={
 		               
 
      
@@ -43,9 +46,10 @@ var Game ={
 		game.load.image("grass_map", "PlanetCute/Grass Block.png");
 		game.load.image("player", "PlanetCute/Character Boy.png");
 		game.load.image("town", "PlanetCute/Wall Block.png");
-		game.load.image("enemy","PlanetCute/Character Princess Girl.png")
+		game.load.image("enemy","PlanetCute/Character Princess Girl.png");
 
-		game.load.image("sword", "ChanceCards/Sword.png")
+		game.load.image("sword", "ChanceCards/Sword.png");
+		game.load.image("stone", "ChanceCards/Runestone_Blue.png");
 	},
 
 	create: function() {
@@ -55,7 +59,7 @@ var Game ={
 		EnemyGroup = game.add.group();
 		ChanceCardGroup = game.add.group();
 
-		game.stage.backgroundColor = "#000000"
+		game.stage.backgroundColor = "#000000";
 	    for(var i = 0; i < MapSizeY; i ++){
 	     	MapArray[i] = [];
 			for(var j = 0; j < MapSizeX; j ++){
@@ -101,6 +105,7 @@ var Game ={
 		//add player HP and other stats on TOP
 		create_stats_overlay();
 		create_inventory();
+		game.camera.follow(player);
 
 	},
 	update: function () {
@@ -122,18 +127,33 @@ var Game ={
 
 	}
 
+
 }
 
 function create_chance_cards (){
 	//create the card outside of camera
 	var ChanceTile = game.add.sprite(0, 0, "sword");
+	ChanceTile.data={
+		HP: 1
+	}
+	create_chance_cards_helper(ChanceTile);
+	ChanceTile = game.add.sprite(0,0,"stone");
+	ChanceTile.data={
+		HP:-1
+	}
+	create_chance_cards_helper(ChanceTile);
 
+
+
+}
+function create_chance_cards_helper (ChanceTile) {
 	ChanceTile.inputEnabled = false;
 	ChanceTile.events.onInputDown.add (chance_event,this);
 	ChanceTile.kill();
 	// fill the array
-	ChanceCardArray[0] =ChanceTile;
+	ChanceCardArray.push(ChanceTile);
 	ChanceCardGroup.add(ChanceTile);
+
 }
 
 
@@ -165,7 +185,8 @@ function Map_event(MapTile){
 		//start event;
 
 		hasEvent = true;
-		get_chance_card();
+
+		move_tween.onComplete.add(get_chance_card, this);
 
 	}
 		MapTile.tint = Math.random() * 0xffffff;
@@ -191,16 +212,30 @@ function get_chance_card (){
 
 	MapGroup.alpha = 0.5;
 	MapGroup.inputEnabled = false;
-	var rng = game.rnd.integerInRange(0,1);
-	var show_card_tween = game.add.tween(ChanceCardArray[0]).to({x: ChanceCardX/2, y:ChanceCardY}, 500);
+	var rng = game.rnd.integerInRange(0,3);
+	
 	
 	switch (rng){
-		default :
+		case 1:
+		//noevent
+			ChanceCardArray[1].reset(ChanceCardX, ChanceCardY);
+			ChanceCardArray[1].inputEnabled= true;
+			var show_card_tween = game.add.tween(ChanceCardArray[1]).to({x: ChanceCardX/2, y:ChanceCardY}, 500);
+			show_card_tween.start();	
+			break;
+
+		case 2:
 			ChanceCardArray[0].reset(ChanceCardX, ChanceCardY);
 			ChanceCardArray[0].inputEnabled= true;
-			show_card_tween.start();
-			
+			var show_card_tween = game.add.tween(ChanceCardArray[0]).to({x: ChanceCardX/2, y:ChanceCardY}, 500);
+			show_card_tween.start();		
 			break;
+
+		default :
+			MapGroup.alpha = 1;
+			hasEvent = false;
+			break;
+
 
 	}
 	
@@ -209,12 +244,10 @@ function get_chance_card (){
 //events for what happens when the card is clicked
 function chance_event(ChanceTile){
 
-	MapGroup.InputEnabled = true; // restore control
 	MapGroup.alpha = 1;
-	ChanceTile.visiable = false;
 	ChanceTile.inputEnabled = false;
 
-	player.data.HP +=1;
+	player.data.HP += ChanceTile.data.HP;
 	hasEvent = false;
 	ChanceTile.kill();
 
