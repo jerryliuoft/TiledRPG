@@ -1,11 +1,9 @@
-var game;
+var RPG = RPG || {};
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '');
-game.world.setBounds(0, 0, 2048, 1024);
-game.camera.follow(player);
+RPG.game = new Phaser.Game(640,960 , Phaser.CANVAS, '');
 
-game.state.add('MenuState', MenuState);
-
-game.state.add('GameState', GameState);
-
-game.state.start('MenuState');
+RPG.game.state.add('Boot', RPG.BootState);
+RPG.game.state.add('Preloader', RPG.PreloadState);
+RPG.game.state.add('Menu', RPG.MenuState);
+RPG.game.state.add('Game', RPG.GameState);
+RPG.game.state.start('Boot');

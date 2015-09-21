@@ -1,50 +1,53 @@
 'use strict';
 
+var RPG = RPG || {};
+/**
+* preload state that loads all assets and shows load bar
+*
+*/
 
+RPG.PreloadState = function (game){
+    RPG.GAME_WIDTH = 640;
+    RPG.GAME_HEIGHT = 960;
 
-var PreloadState= {
-
-
+};
+RPG.PreloadState.prototype= {
 
 	preload: function() {
 
-		this.ready = false;
-		this.load.image('preloader', 'assets/preloader.gif');
-	
-		this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
-		this.asset = this.add.sprite (this.width/2, this.height/2, 'preloader');
+		//this.asset.cropEnabled = true;
+		// load the sprite in the middle of the screen
+		this.asset = this.add.sprite (RPG.GAME_WIDTH/2, RPG.GAME_HEIGHT/2, 'preloadBar');
 		this.asset.anchor.setTo (0.5,0.5);
+		//set this as preloader sprite
 		this.load.setPreloadSprite(this.asset);
+
+		// when this.ready turns true = game finished loading, load next state
+		this.ready = false;
+		// load a sprite for loader image
+		this.preloadBar
+		this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
+		this.game.load.image("star", "PlanetCute/Star.png");
+		this.game.load.image("map_grass", "PlanetCute/Grass Block.png");
+		this.game.load.image("player", "PlanetCute/Character Boy.png");
+		this.game.load.image("town", "PlanetCute/Wall Block.png");
+		this.game.load.image("enemy","PlanetCute/Character Princess Girl.png");
+		this.game.load.image("sword", "ChanceCards/Sword.png");
+		this.game.load.image("stone", "ChanceCards/Runestone_Blue.png");
+
+
+        this.game.load.image("wall", "./img/wall.png");
+        this.game.load.image("floor", "./img/floor.png");
 	
-		this.load.image('background', 'assets/background.png');
-		this.load.image('ground','assets/ground.png');
-		this.load.image('title','assets/title.png');
-		this.load.image('startButton', 'assets/start-button.png');
-		this.load.spritesheet('bird','assets/bird.png',34,24,3);
-		this.load.spritesheet('pipe', 'assets/pipes.png', 54,320,2);
-
-		this.load.image('instructions', 'assets/instructions.png');
-		this.load.image('getReady', 'assets/get-ready.png');
-		this.load.bitmapFont('flappyfont', 'assets/fonts/flappyfont/flappyfont.png', 'assets/fonts/flappyfont/flappyfont.fnt');  
-
-		this.load.audio('score', 'assets/score.wav');
-		this.load.audio('flap', 'assets/flap.wav');
-		this.load.audio('pipeHit', 'assets/pipe-hit.wav');
-		this.load.audio('groundHit', 'assets/ground-hit.wav');
-		this.load.image('scoreboard', 'assets/scoreboard.png');
-		this.load.image('gameover', 'assets/gameover.png');
-    	this.load.spritesheet('medals', 'assets/medals.png', 44, 46, 2);
-    	this.load.image('particle', 'assets/particle.png');
-
 	},
 
 	create:function (){
-		this.asset.cropEnabled = false;
+
 	},
 
 	update:function (){
 		if(this.ready){
-			this.game.state.start('Play');
+			this.game.state.start('Menu');
 		}
 	},
 
