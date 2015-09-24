@@ -27,16 +27,10 @@ RPG.PreloadState.prototype= {
 		// load a sprite for loader image
 		this.preloadBar
 		this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
-		this.game.load.image("star", "PlanetCute/Star.png");
-		this.game.load.image("map_grass", "PlanetCute/Grass Block.png");
-		this.game.load.image("map_water", "PlanetCute/Water Block.png");
-		this.game.load.image("boy", "PlanetCute/Character Boy.png");
-		this.game.load.image("town", "PlanetCute/Wall Block.png");
-		this.game.load.image("enemy","PlanetCute/Character Princess Girl.png");
-		this.game.load.image("sword", "ChanceCards/Sword.png");
-		this.game.load.image("stone", "ChanceCards/Runestone_Blue.png");
-        this.game.load.image("wall", "img/wall.png");
-        this.game.load.image("floor", "img/floor.png");
+        this.game.load.spritesheet("grass", "img/grass.png",16,16,4);
+        this.game.load.spritesheet("mountain", "img/mountain.png",16,16,4);
+        this.game.load.spritesheet("ocean", "img/ocean.png",16,16,4);
+        this.game.load.spritesheet("shore", "img/shore.png",16,16,9);
 		this.game.load.image("player", "img/player.png");
 	},
 

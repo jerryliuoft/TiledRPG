@@ -9,11 +9,8 @@ RPG.GameState.prototype = {
     },
 
     create: function () {
-        this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        //this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
-        //game.world.setBounds(0, 0, 1920, 1920);
-        // Add menu screen.
-        // It will act as a button to start the game.
         /**
         *Map = function(game, floor, wall, min_room_size, max_room_size, max_room_number)
         *These parameters are here for example. The required parameters are:
@@ -22,18 +19,18 @@ RPG.GameState.prototype = {
         *Minimum room size (in tiles) (ex.  2)
         *Maximum room size (in tiles) (ex. 5)
         *Maximum number of rooms possible (ex. 10)
-
         *
         */
+        this.game.world.setBounds(0, 0, 640, 480);
+        //this.game.world.setBounds(0, 0, 1920, 1920);
+        this.game_map = new Map(this.game, 'grass','shore',3,8,2);
+        this.player = new Player(this.game,'player', this.game_map.player_x, this.game_map.player_y);
+        this.camera.follow(this.player);
 
-
-        this.game_map = new Map(this.game, 'floor','wall',2,4,4);
-        this.player = new Player(this.game,'player', 10, 20);
-
-        //this.game.add.sprite (5,5, "player");
 
     },
     update : function (){
+        this.game.physics.arcade.collide(this.player, this.game_map.walls);
 
 
     }
