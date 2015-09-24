@@ -21,11 +21,13 @@ RPG.GameState.prototype = {
         *Maximum number of rooms possible (ex. 10)
         *
         */
-        this.game.world.setBounds(0, 0, 640, 480);
-        //this.game.world.setBounds(0, 0, 1920, 1920);
-        this.game_map = new Map(this.game, 'grass','shore',3,8,2);
+        //this.game.world.setBounds(0, 0, 640, 480);
+        this.game.world.setBounds(0, 0, 1920, 1920);
+        this.game_map = new Map(this.game, 'grass','water',3,8,5);
+
         this.player = new Player(this.game,'player', this.game_map.player_x, this.game_map.player_y);
         this.camera.follow(this.player);
+
 
 
     },

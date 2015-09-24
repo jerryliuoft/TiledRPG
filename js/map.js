@@ -7,22 +7,28 @@ Map = function(game, floor, wall, min_room_size, max_room_size, max_room_number)
     
     //lets initiate some parameters
     //tile sizses in pixels
-    this.wall_tile_size = 16;
-    this.floor_tile_size = 16;
+
+    this.floor_tile_size_height = 80;
+    this.floor_tile_size_width = 100;
+    this.tile_offset_x =0;
+    this.tile_offset_y =50;
+    this.floor_image = "grass";
+    this.wall_image = null;
+
+
     //group that holds the walkable tiles
-    this.floors = game.add.group();
-    this.floor_image = floor;
+    this.floors = game.add.group();  
     //group that holds the walls
     this.walls = game.add.group();
     this.walls.enableBody = true;
-    this.wall_image = wall;
+    
     this.game = game;  
 
     //set the map array to hold all the floors with coordinates, so the correct walls can be set
     this.maps = [];
-    for (var x = 0; x <= this.game.world.width/this.floor_tile_size ; x++){
+    for (var x = 0; x <= this.game.world.width/this.floor_tile_size_width ; x++){
         this.maps [x] = [];
-        for (var y = 0; y <= this.game.world.height/this.floor_tile_size ; y++){
+        for (var y = 0; y <= this.game.world.height/this.floor_tile_size_height ; y++){
             this.maps[x][y] = 1;
         }
     }
@@ -58,141 +64,112 @@ Map.prototype.Room = function(x, y, w, h) {
     var center_y = (this.y1 + this.y2) / 2;
     this.center_coords = {x: center_x, y: center_y};    
 }
+
 //create a floor, if a wall is present, destroy the wall
 Map.prototype.createFloor = function(x, y) {
-    fl = this.floors.create(x, y, this.floor_image, this.game.rnd.integerInRange(2,3));
-    this.game.physics.arcade.enable(fl);
-    this.game.physics.arcade.overlap(fl, this.walls, function(floor, wall) {
-        wall.destroy();
-    });
-    this.maps[x/this.floor_tile_size][y/this.floor_tile_size] = fl;    
+
+    if (this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height] == 1){ // 
+        fl = this.floors.create(x, y, this.floor_image);
+        this.game.physics.arcade.enable(fl);
+        fl.body.setSize(this.floor_tile_size_width, this.floor_tile_size_height, this.tile_offset_x, this.tile_offset_y);
+        this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height] = fl;  
+
+    }else{
+        if (this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height].parent != this.floors){
+            this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height].destroy ();// destroy the wall
+            fl = this.floors.create(x, y, this.floor_image);
+            this.game.physics.arcade.enable(fl);
+            fl.body.setSize(this.floor_tile_size_width, this.floor_tile_size_height, this.tile_offset_x, this.tile_offset_y);
+            this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height] = fl;
+        }
+    }
+
+
 }
 //create wall, if there exists, a floor tile, do not put down a wall.
 Map.prototype.createWall = function(x,y){
-    //check all 8 directions for floor tiles and pick the correct image to put
 
-    //check top, bottom, left and right
-    var left_x = (x - this.floor_tile_size)/this.floor_tile_size;
-    var right_x = (x + this.floor_tile_size)/this.floor_tile_size;
-    var top_y = (y - this.floor_tile_size)/this.floor_tile_size;
-    var bottom_y = (y + this.floor_tile_size)/this.floor_tile_size;
-    var middle_y = y /this.floor_tile_size;
-    var middle_x = x/this.floor_tile_size;
-    var sprite_frame = 0;
+    if (this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height] == 1){
+        //wl = this.game.add.sprite(x, y, this.wall_image);
+        wl = this.walls.create(x, y, this.wall_image);
+        //get rid of the transparencies in the sprite
+        this.game.physics.arcade.enable(wl);
+        wl.body.setSize(this.floor_tile_size_width, this.floor_tile_size_height, this.tile_offset_x, this.tile_offset_y);
+        wl.body.immovable = true;
+        //this.walls.add(wl);
+        this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height] = wl;
 
-    var counter = 0;
-    //check top
-    if( this.maps[middle_x][top_y] != 1){
-        counter +=1;
-    }
-    //check bottom
-    if( this.maps[middle_x][bottom_y] != 1){
-        counter +=10;
     }
 
-    //check left
-    if( this.maps[left_x][middle_y] != 1){
-        counter +=100;
-    }
-    //check right
-
-    if( this.maps[right_x][middle_y] != 1){
-        counter +=1000;
-    }
-
-    // get the sprite for all the directions
-    switch(counter){
-        case 1: // only top
-            sprite_frame = 1;
-            break;
-        case 10:// only bottom
-            sprite_frame =7;
-            break;
-        case 100: // only left
-            sprite_frame=3;
-            break;
-        case 1000: // only right
-            sprite_frame = 5;
-            break;
-        case 101://top left
-            sprite_frame = 0;
-            break;
-        case 1001: // top right
-            sprite_frame = 5;
-            break;
-        case 110: // bottom left
-            sprite_frame=6;
-            break;
-        case 1010: // top right
-            sprite_frame = 8;
-            break;   
-        default: // some lake
-            console.log("got value"+ counter);
-            sprite_frame = 4;
-    }
-
-
-
-    wl = this.game.add.sprite(x, y, this.wall_image, sprite_frame);
-    this.game.physics.arcade.enable(wl);
-    wl.body.immovable = true;
-    this.game.physics.arcade.overlap(wl, this.floors, function() {
-        wl.destroy();
-    });
-    this.game.physics.arcade.overlap(wl, this.walls, function(floor, wall) {
-        wall.destroy();
-    });  
-    this.walls.add(wl);
 }
 
 Map.prototype.createRoom = function(x1, x2, y1, y2) {
-    for (var x = x1; x<x2; x+=this.floor_tile_size) {
-        for (var y = y1; y<y2; y+=this.floor_tile_size) {
+    for (var x = x1; x<x2; x+=this.floor_tile_size_width) {
+        for (var y = y1; y<y2; y+=this.floor_tile_size_height) {
             this.createFloor(x, y);
             if (x== x1){
-                this.createWall(x1-this.wall_tile_size,y);
+                //create the walls on left and right
+                this.createWall(x1-this.floor_tile_size_width,y);
                 this.createWall(x2, y);
             }
-        this.createWall (x, y1 -this.wall_tile_size);
+        //create the walls on top and bottom
+        this.createWall (x, y1 -this.floor_tile_size_height);
         this.createWall (x, y2);
         }
     }
+    // need to add 4 walls to cover the corners TODO could make this another function but it would be slower
+    this.createWall (x1-this.floor_tile_size_width, y1 -this.floor_tile_size_height);
+    this.createWall (x2, y2);
+    this.createWall (x1-this.floor_tile_size_width, y2);
+    this.createWall (x2, y1 -this.floor_tile_size_height);
 
 
 }
 Map.prototype.createHTunnel = function(x1, x2, y) {
     var min = Math.min(x1, x2);
     var max = Math.max(x1, x2);
-    for (var x = min; x<=max; x+=this.floor_tile_size) {
+    for (var x = min; x<=max; x+=this.floor_tile_size_width) {
         this.createFloor(x, y);
-        this.createWall (x, y-this.wall_tile_size );
-        this.createWall (x, y+this.wall_tile_size);
+        this.createWall (x, y-this.floor_tile_size_height );
+        this.createWall (x, y+this.floor_tile_size_height);
     }
     //close off the ends with walls
-    this.createWall (min - this.wall_tile_size, y);
+    this.createWall (min - this.floor_tile_size_width, y);
     this.createWall (max, y );
 }
 Map.prototype.createVTunnel = function(y1, y2, x) {
     var min = Math.min(y1, y2);
     var max = Math.max(y1, y2);
-    for (var y = min; y<=max; y+=this.floor_tile_size) {      
+    for (var y = min; y<=max; y+=this.floor_tile_size_height) {      
         this.createFloor(x, y);
-        this.createWall (x+this.wall_tile_size, y);
-        this.createWall (x-this.wall_tile_size, y );
+        this.createWall (x+this.floor_tile_size_width, y);
+        this.createWall (x-this.floor_tile_size_width, y );
     }    
 
-    this.createWall (x, min - this.wall_tile_size);
+    this.createWall (x, min - this.floor_tile_size_height);
     this.createWall (x, max);
+}
+// display all the sprites in the right layer
+Map.prototype.renderMap = function (){
+    for (var x = 0; x <= this.game.world.width/this.floor_tile_size_width ; x++){
+        for (var y = 0; y <= this.game.world.height/this.floor_tile_size_height ; y++){
+            if (this.maps[x][y] != 1){
+                this.maps[x][y].bringToTop();
+                //this.game.world.bringToTop(this.maps[x][y]);
+            }
+        }
+    }
+
 }
 Map.prototype.makeMap = function() {
     for (var r=0; r<this.max_rooms; r++) {
         // create a random size room
-        var w = this.game.rnd.integerInRange(this.room_min_size, this.room_max_size) * this.floor_tile_size;
-        var h = this.game.rnd.integerInRange(this.room_min_size, this.room_max_size) * this.floor_tile_size;
+        var w = this.game.rnd.integerInRange(this.room_min_size, this.room_max_size) * this.floor_tile_size_width;
+        var h = this.game.rnd.integerInRange(this.room_min_size, this.room_max_size) * this.floor_tile_size_height;
 
         // find a position in the world to set the room
-        x = this.game.rnd.integerInRange(1, ((this.game.world.width ) / this.floor_tile_size) - (w/this.floor_tile_size + 1)) * this.floor_tile_size;
-        y = this.game.rnd.integerInRange(1, ((this.game.world.height) / this.floor_tile_size) - (h/this.floor_tile_size + 1)) * this.floor_tile_size;
+        x = this.game.rnd.integerInRange(1, ((this.game.world.width ) / this.floor_tile_size_width) - (w/this.floor_tile_size_width + 1)) * this.floor_tile_size_width;
+        y = this.game.rnd.integerInRange(1, ((this.game.world.height) / this.floor_tile_size_height) - (h/this.floor_tile_size_height + 1)) * this.floor_tile_size_height;
 
         this.createRoom(x, x+w, y, y+h);
 
@@ -201,21 +178,24 @@ Map.prototype.makeMap = function() {
            this.player_x = x + (w/2);
            this.player_y = y + (h/2);
         } else {
-            var new_x = this.game.math.snapToFloor(x + (w/2), this.wall_tile_size);
-            var new_y = this.game.math.snapToFloor(y + (h/2), this.wall_tile_size);
+            var new_x = this.game.math.snapToFloor(x + (w/2), this.floor_tile_size_width);
+            var new_y = this.game.math.snapToFloor(y + (h/2), this.floor_tile_size_height);
 
-            var prev_x = this.game.math.snapToFloor(this.lastRoomCoords.x, this.wall_tile_size);
-            var prev_y = this.game.math.snapToFloor(this.lastRoomCoords.y, this.wall_tile_size);
+            var prev_x = this.game.math.snapToFloor(this.lastRoomCoords.x, this.floor_tile_size_width);
+            var prev_y = this.game.math.snapToFloor(this.lastRoomCoords.y, this.floor_tile_size_height);
 
-            // make the Tunnel bigger
-            this.createHTunnel(prev_x, new_x, prev_y+this.floor_tile_size);
+            
+
             this.createHTunnel(prev_x, new_x, prev_y);
-            this.createVTunnel(prev_y, new_y, new_x+ this.floor_tile_size);
             this.createVTunnel(prev_y, new_y, new_x);
+            // make the Tunnel bigger
+            //this.createHTunnel(prev_x, new_x, prev_y+this.floor_tile_size_height);
+            //this.createVTunnel(prev_y, new_y, new_x+ this.floor_tile_size_width);
         }
 
         this.lastRoomCoords = { x: x + (w/2), y: y + (h/2) };
         this.num_rooms++;
 
     }
+    this.renderMap();
 }

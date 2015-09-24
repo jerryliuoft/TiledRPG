@@ -15,7 +15,7 @@ RPG.MenuState.prototype = {
         // Add menu screen.
         // It will act as a button to start the game.
         this.add.button(5, 30, 'player', this.startGame, this);
-
+        this.state.start('Game');
     },
 
     startGame: function () {
