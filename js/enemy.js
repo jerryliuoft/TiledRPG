@@ -1,9 +1,9 @@
-//player class
+//Enemy class
 
 'use strict'
 
- function Player(game, x, y, map, floors){
-	console.log('in Player!');
+ function Enemy(game, x, y, map, floors){
+	console.log('in Enemy!');
 
     this.floor_tile_size_height = 80;
     this.floor_tile_size_width = 100;
@@ -13,10 +13,10 @@
     var new_y = game.math.snapToFloor(y, this.floor_tile_size_height);
 
 
-	Phaser.Sprite.call(this, game, new_x, new_y, "player");
+	Phaser.Sprite.call(this, game, new_x, new_y, "Enemy");
     
 	
-	console.log('the tile at player is '+ map[0][0]);
+	console.log('the tile at Enemy is '+ map[0][0]);
 	this.game.physics.arcade.enableBody(this);
     this.body.setSize(this.floor_tile_size_width, this.floor_tile_size_height, 0, 50);
 
@@ -28,10 +28,10 @@
     this.initKeyboard(game);
 	
 };
-Player.prototype = Object.create(Phaser.Sprite.prototype);
-Player.prototype.constructor = Player;
+Enemy.prototype = Object.create(Phaser.Sprite.prototype);
+Enemy.prototype.constructor = Enemy;
 
-Player.prototype.initKeyboard = function (game){
+Enemy.prototype.initKeyboard = function (game){
 
     // add the up down left right keys for movement
     this.key1 = game.input.keyboard.addKey(Phaser.Keyboard.UP);
@@ -45,29 +45,29 @@ Player.prototype.initKeyboard = function (game){
 
 }
 
-Player.prototype.moveUp = function(){
+Enemy.prototype.moveUp = function(){
     if (this.canMove('up')){
         this.y -= this.floor_tile_size_height;
     }   
 }
-Player.prototype.moveDown = function(){
+Enemy.prototype.moveDown = function(){
     if (this.canMove('down'))
     {
         this.y += this.floor_tile_size_height;
     }
 }
-Player.prototype.moveLeft = function(){
+Enemy.prototype.moveLeft = function(){
     if (this.canMove('left')){
     this.x -= this.floor_tile_size_width;
     }
 }
-Player.prototype.moveRight = function(){
+Enemy.prototype.moveRight = function(){
     if (this.canMove('right')){
     this.x += this.floor_tile_size_width;
     }
 }
 
-Player.prototype.canMove = function (direction){
+Enemy.prototype.canMove = function (direction){
 
     var x_index = this.x/this.floor_tile_size_width;
     var y_index = this.y/this.floor_tile_size_height;
@@ -100,41 +100,7 @@ Player.prototype.canMove = function (direction){
     return false;
 }
 
-Player.prototype.update= function (){
+Enemy.prototype.update= function (){
 
-  /*
-  
-    this.body.velocity.x = 0;
-    this.body.velocity.y = 0;                     
-  
-    if (this.cursors.left.onDown) {
-        console.log ("hi");
-    } 
-
-    else if (this.cursors.right.onDown) {
-        this.game.physics.arcade.moveToXY(
-        this, 
-        this.body.x + this.width, // target x position
-        this.body.y, // keep y position the same as we are moving along x axis
-        250 // velocity to move at
-        );
-
-    } 
-    
-    if (this.cursors.up.onDown) {
-        this.game.physics.arcade.moveToXY(
-        this, 
-        this.body.x, // target x position
-        this.body.y-this.height, // keep y position the same as we are moving along x axis
-        250 // velocity to move at
-        );
-    } else if (this.cursors.down.onDown) {
-        this.game.physics.arcade.moveToXY(
-        this, 
-        this.body.x, // target x position
-        this.body.y+this.height, // keep y position the same as we are moving along x axis
-        250 // velocity to move at
-        );
-    }  
-    */   
+   
 }

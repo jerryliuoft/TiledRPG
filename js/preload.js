@@ -34,6 +34,13 @@ RPG.PreloadState.prototype= {
         this.game.load.image("water", "PlanetCute/Water Block.png");
         this.game.load.image("wood", "PlanetCute/Wood Block.png");
 
+        this.game.load.image("tree_short", "PlanetCute/Tree Short.png");
+        this.game.load.image("tree_tall", "PlanetCute/Tree Tall.png");
+        this.game.load.image("tree_ugly", "PlanetCute/Tree Ugly.png");
+        this.game.load.image("rock", "PlanetCute/Rock.png");
+
+        this.game.load.image("background", "img/Cartoon Clouds And Blue Sky Wallpaper 2560X1600.jpg");
+
 		this.game.load.image("player", "PlanetCute/Character Cat Girl.png");
 	},
 
