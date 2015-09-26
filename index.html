@@ -15,6 +15,7 @@
     <script src="js/menu.js"></script>
     <script src="js/game.js"></script>
     <script src="js/player.js"></script>
+    <script src="js/enemy.js"></script>
 
 
 
@@ -23,8 +24,8 @@
 <body>
 <script>
 (function() {
-    var game = new Phaser.Game(640, 480, Phaser.AUTO, '');
-    //var game = new Phaser.Game(1920, 1920, Phaser.AUTO, '');
+    //var game = new Phaser.Game(640, 480, Phaser.AUTO, '');
+    var game = new Phaser.Game(1920, 1920, Phaser.AUTO, '');
     game.state.add('Boot', RPG.BootState);
     game.state.add('Preloader', RPG.PreloadState);
     game.state.add('Menu', RPG.MenuState);

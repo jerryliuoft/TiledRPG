@@ -74,22 +74,22 @@ Player.prototype.canMove = function (direction){
 
     switch (direction){
         case 'up' :
-            if (this.maps[x_index][y_index-1].parent != this.floors){
+            if (this.maps[x_index][y_index-1].parent == this.floors){
                 return true;
             }
             break;
         case 'down':
-                if (this.maps[x_index][y_index+1].parent != this.floors){
+                if (this.maps[x_index][y_index+1].parent == this.floors){
                 return true;
             }
             break;
         case 'left':
-            if (this.maps[x_index-1][y_index].parent != this.floors){
+            if (this.maps[x_index-1][y_index].parent == this.floors){
                 return true;
             }
             break;
         case 'right':
-            if (this.maps[x_index+1][y_index].parent != this.floors){
+            if (this.maps[x_index+1][y_index].parent == this.floors){
                 return true;
             }
             break;

@@ -30,7 +30,7 @@ RPG.GameState.prototype = {
 
 
 
-        this.player = new Player(this.game, this.game_map.player_x, this.game_map.player_y, this.game_map.maps, this.game_map.walls);
+        this.player = new Player(this.game, this.game_map.player_x, this.game_map.player_y, this.game_map.maps, this.game_map.floors);
 
         // TODO make tree apear infront of player if player is behind
         this.game_map.walls.add(this.player);
@@ -41,9 +41,15 @@ RPG.GameState.prototype = {
         this.camera.follow(this.stalker);
 
         //water animation
+        /*
         this.water = this.game.add.sprite (this.game_map.player_x,this.game_map.player_y,'water');
         var bounce = this.game.add.tween(this.water);
         bounce.to({y:this.water.y+10}, 500,Phaser.Easing.Linear.None, true, 0, -1,1);
+        */
+        for (var i =0; i < 10; ++i){
+            this.enemy = new Enemy(this.game, this.game_map.maps, this.game_map.floors, this.player);
+
+        }
 
 
     },
