@@ -12,7 +12,7 @@ Map = function(game, min_room_size, max_room_size, max_room_number) {
     this.floor_tile_size_width = 100;
     this.tile_offset_x =0;
     this.tile_offset_y =50;
-    this.floor_image = "grass";
+    this.floor_image = ["grass", "wood", "plain", "dirt", "grass", "grass"] ;
     this.wall_image = null;
     this.tree_image= ["tree_short", "tree_tall", "tree_ugly", "rock"];
     this.tree_chance = 2;
@@ -70,8 +70,8 @@ Map.prototype.Room = function(x, y, w, h) {
 //create a floor, if a wall is present, destroy the wall
 Map.prototype.createFloor = function(x, y) {
 
-    if (this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height] == 1){ // 
-        fl = this.floors.create(x, y, this.floor_image);
+    if (this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height] == 1){ // nothing exists
+        fl = this.floors.create(x, y + this.game.rnd.integerInRange(-10,10), this.floor_image[this.game.rnd.integerInRange(0,this.floor_image.length-1)]);
         this.game.physics.arcade.enable(fl);
         fl.body.setSize(this.floor_tile_size_width, this.floor_tile_size_height, this.tile_offset_x, this.tile_offset_y);
         this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height] = fl;  
@@ -79,7 +79,7 @@ Map.prototype.createFloor = function(x, y) {
     }else{
         if (this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height].parent != this.floors){
             this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height].destroy ();// destroy the wall
-            fl = this.floors.create(x, y, this.floor_image);
+            fl = this.floors.create(x, y + this.game.rnd.integerInRange(-10,10), this.floor_image[this.game.rnd.integerInRange(0,this.floor_image.length-1)]);
             this.game.physics.arcade.enable(fl);
             fl.body.setSize(this.floor_tile_size_width, this.floor_tile_size_height, this.tile_offset_x, this.tile_offset_y);
             this.maps[x/this.floor_tile_size_width][y/this.floor_tile_size_height] = fl;

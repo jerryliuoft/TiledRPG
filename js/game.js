@@ -26,7 +26,7 @@ RPG.GameState.prototype = {
         this.game.world.setBounds(0, 0, 1920, 1920);
         this.background = this.game.add.tileSprite (0,0,1920,1920,'background');
         this.background.autoScroll(-20,0); // make sky move
-        this.game_map = new Map(this.game,3,8,5);
+        this.game_map = new Map(this.game,2,10,7);
 
 
 
@@ -46,7 +46,7 @@ RPG.GameState.prototype = {
         var bounce = this.game.add.tween(this.water);
         bounce.to({y:this.water.y+10}, 500,Phaser.Easing.Linear.None, true, 0, -1,1);
         */
-        for (var i =0; i < 10; ++i){
+        for (var i =0; i < 2; ++i){
             this.enemy = new Enemy(this.game, this.game_map.maps, this.game_map.floors, this.player);
 
         }
