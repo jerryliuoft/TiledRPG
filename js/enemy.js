@@ -12,13 +12,11 @@
     this.distance_to_player_x= 999;
     this.distance_to_player_y= 999;
 
+
     //set up the sprite to the correct location
-    var startPos = floors.getRandom();
-    var new_x = game.math.snapToFloor(startPos.x, this.floor_tile_size_width);
-    var new_y = game.math.snapToFloor(startPos.y, this.floor_tile_size_height);
+    var startPos = this.findStartPosition(floors, map);
 
-
-	Phaser.Sprite.call(this, game, new_x, new_y, "enemy");
+	Phaser.Sprite.call(this, game, startPos.x, startPos.y, "Cat Girl");
     
 	this.game.physics.arcade.enableBody(this);
     this.body.setSize(this.floor_tile_size_width, this.floor_tile_size_height, 0, 50);
@@ -28,12 +26,26 @@
 	this.game = game;
     this.floors = floors;
     this.maps = map;
-    this.initKeyboard(game);
     this.player = player;
+    this.initKeyboard(game);
+
 	
 };
 Enemy.prototype = Object.create(Phaser.Sprite.prototype);
 Enemy.prototype.constructor = Enemy;
+
+Enemy.prototype.findStartPosition = function (floors, map){
+    var startPos = floors.getRandom();
+    while(map[startPos.data.x_index][startPos.data.y_index].movable == false){
+        startPos = floors.getRandom();
+    }
+    map[startPos.data.x_index][startPos.data.y_index].movable = false;
+    map[startPos.data.x_index][startPos.data.y_index].has_enemy = true;
+
+
+    return startPos;
+}
+
 
 Enemy.prototype.initKeyboard = function (game){
 
@@ -56,24 +68,24 @@ Enemy.prototype.move = function(){
         if(Math.abs(this.distance_to_player_x) > Math.abs(this.distance_to_player_y)){
             if (this.distance_to_player_x >0) {
                 // move left
-                if (this.canMove('left')){
+                if (this.canMove(-1, 0)){
                     this.x -= this.floor_tile_size_width;
                 }
             }else{
                 // move right
-                if (this.canMove('right')){
+                if (this.canMove(1,0)){
                     this.x += this.floor_tile_size_width;
                 }
             }
         }else{
             if (this.distance_to_player_y >0) {
-                // move left
-                if (this.canMove('up')){
+               // move up
+                if (this.canMove(0,-1)){
                     this.y -= this.floor_tile_size_height;
                 }
             }else{
-                // move right
-                if (this.canMove('down')){
+                //move down
+                if (this.canMove(0 , 1)){
                     this.y += this.floor_tile_size_height;
                 }
             }
@@ -86,43 +98,27 @@ Enemy.prototype.move = function(){
     }
 }
 // check if there's no obsticles there
-Enemy.prototype.canMove = function (direction){
+Enemy.prototype.canMove = function (x ,y){
 
     var x_index = this.x/this.floor_tile_size_width;
     var y_index = this.y/this.floor_tile_size_height;
 
-    switch (direction){
-        case 'up' :
-            if (this.maps[x_index][y_index-1].parent == this.floors){
-                return true;
-            }
-            break;
-        case 'down':
-                if (this.maps[x_index][y_index+1].parent == this.floors){
-                return true;
-            }
-            break;
-        case 'left':
-            if (this.maps[x_index-1][y_index].parent == this.floors){
-                return true;
-            }
-            break;
-        case 'right':
-            if (this.maps[x_index+1][y_index].parent == this.floors){
-                return true;
-            }
-            break;
-        default:
-            return false;
-
+    if (this.maps[x_index+ x][y_index+ y].movable== true){
+        this.maps[x_index+ x][y_index+ y].has_enemy = true;
+        this.maps[x_index+ x][y_index+ y].movable = false;
+        //reset old tile
+        this.maps[x_index][y_index].has_enemy = false;
+        this.maps[x_index][y_index].movable = true;
+        return true;
     }
     return false;
 }
+
 
 Enemy.prototype.update= function (){
 
 
     this.distance_to_player_x =(this.x - this.player.x)/this.floor_tile_size_width;
-    this.distance_to_player_y = (this.y- this.player.y)/this.floor_tile_size_height;
+    this.distance_to_player_y =(this.y - this.player.y)/this.floor_tile_size_height;
    
 }

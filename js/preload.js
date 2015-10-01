@@ -41,7 +41,11 @@ RPG.PreloadState.prototype= {
 
         this.game.load.image("background", "img/Cartoon Clouds And Blue Sky Wallpaper 2560X1600.jpg");
 
-		this.game.load.image("player", "PlanetCute/Character Cat Girl.png");
+		this.game.load.image("Cat Girl", "PlanetCute/Character Cat Girl.png");
+		this.game.load.image("player", "PlanetCute/Character Boy.png");
+		this.game.load.image("Pink Girl", "PlanetCute/Character Pink Girl.png");
+		this.game.load.image("Princess", "PlanetCute/Character Princess Girl.png");
+
 		this.game.load.image("enemy", "PlanetCute/Enemy Bug.png");
 	},
 

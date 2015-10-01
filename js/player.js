@@ -15,8 +15,6 @@
 
 	Phaser.Sprite.call(this, game, new_x, new_y, "player");
     
-	
-	console.log('the tile at player is '+ map[0][0]);
 	this.game.physics.arcade.enableBody(this);
     this.body.setSize(this.floor_tile_size_width, this.floor_tile_size_height, 0, 50);
 
@@ -25,6 +23,7 @@
 	this.game = game;
     this.floors = floors;
     this.maps = map;
+    //set up the keyboard for moving
     this.initKeyboard(game);
 	
 };
@@ -46,56 +45,42 @@ Player.prototype.initKeyboard = function (game){
 }
 
 Player.prototype.moveUp = function(){
-    if (this.canMove('up')){
+    if (this.canMove(0, -1)){
         this.y -= this.floor_tile_size_height;
     }   
 }
 Player.prototype.moveDown = function(){
-    if (this.canMove('down'))
+    if (this.canMove(0,1))
     {
         this.y += this.floor_tile_size_height;
     }
 }
 Player.prototype.moveLeft = function(){
-    if (this.canMove('left')){
+    if (this.canMove(-1,0)){
     this.x -= this.floor_tile_size_width;
     }
 }
 Player.prototype.moveRight = function(){
-    if (this.canMove('right')){
+    if (this.canMove(1,0)){
     this.x += this.floor_tile_size_width;
     }
 }
-
-Player.prototype.canMove = function (direction){
+// x for num of tiles horizontal
+// y for num of tile verticle
+Player.prototype.canMove = function (x ,y){
 
     var x_index = this.x/this.floor_tile_size_width;
     var y_index = this.y/this.floor_tile_size_height;
 
-    switch (direction){
-        case 'up' :
-            if (this.maps[x_index][y_index-1].parent == this.floors){
-                return true;
-            }
-            break;
-        case 'down':
-                if (this.maps[x_index][y_index+1].parent == this.floors){
-                return true;
-            }
-            break;
-        case 'left':
-            if (this.maps[x_index-1][y_index].parent == this.floors){
-                return true;
-            }
-            break;
-        case 'right':
-            if (this.maps[x_index+1][y_index].parent == this.floors){
-                return true;
-            }
-            break;
-        default:
-            return false;
+    if (this.maps[x_index+ x][y_index+ y].movable){
+        this.maps[x_index+ x][y_index+ y].has_player = true;
+        this.maps[x_index+ x][y_index+ y].movable = false;
+        //set the old tile to normal state
+        this.maps[x_index][y_index].has_player = false;
+        this.maps[x_index][y_index].movable = true;
 
+
+        return true;
     }
     return false;
 }

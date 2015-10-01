@@ -23,8 +23,8 @@ RPG.GameState.prototype = {
         *
         */
         //this.game.world.setBounds(0, 0, 640, 480);
-        this.game.world.setBounds(0, 0, 1920, 1920);
-        this.background = this.game.add.tileSprite (0,0,1920,1920,'background');
+        this.game.world.setBounds(0, 0, 4096, 3072);
+        this.background = this.game.add.tileSprite (0,0,4096,3072,'background');
         this.background.autoScroll(-20,0); // make sky move
         this.game_map = new Map(this.game,2,10,7);
 
@@ -46,7 +46,7 @@ RPG.GameState.prototype = {
         var bounce = this.game.add.tween(this.water);
         bounce.to({y:this.water.y+10}, 500,Phaser.Easing.Linear.None, true, 0, -1,1);
         */
-        for (var i =0; i < 2; ++i){
+        for (var i =0; i < 5; ++i){
             this.enemy = new Enemy(this.game, this.game_map.maps, this.game_map.floors, this.player);
 
         }
@@ -54,7 +54,6 @@ RPG.GameState.prototype = {
 
     },
     update : function (){
-        //this.game.physics.arcade.collide(this.player, this.game_map.walls);
         this.game_map.walls.sort('y', Phaser.Group.SORT_ASCENDING);
         //camera follows the player
         this.game.physics.arcade.moveToObject(this.stalker, this.player,20, 500);
